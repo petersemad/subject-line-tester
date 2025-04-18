@@ -59,7 +59,7 @@ Tone to apply for rewrites: ${tone}
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'gpt-4o-mini-2024-07-18', // 🔥 mini model activated
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7
       })
