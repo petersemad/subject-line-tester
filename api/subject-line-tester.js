@@ -11,44 +11,61 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { subject, tone = 'default' } = req.body;
+  const { subject } = req.body;
 
   if (!subject || subject.trim().length === 0) {
     return res.status(400).json({ error: 'Subject line is required' });
   }
 
   const prompt = `
-You are a B2B email marketing expert who evaluates subject lines for cold emails. You assess based on 4 core attributes: 
-1. Clarity – Is the subject clear and easy to understand?
-2. Curiosity – Does it spark interest?
-3. Personalization – Could it feel unique to the reader?
-4. Spam Risk – Does it trigger filters or look like mass spam?
+You are a B2B cold email expert and subject line strategist.
 
-You return a detailed analysis with scores from 1 to 10 for each category. Then, you calculate a total score out of 100 (by summing the 4 scores and multiplying by 2.5). You give expert feedback, then rewrite the subject line in 3 better variations with different tones or angles. If a tone is requested, use it for the rewrites.
+Your job is to evaluate and improve subject lines used in cold outreach campaigns.
+
+Score the subject line using 4 key attributes. Each is rated out of 25 (total: 100):
+
+1. Clarity – Is it immediately understandable?
+2. Curiosity – Does it spark enough interest to open?
+3. Personalization Potential – Could it be tailored to the recipient's role, company, or industry?
+4. Spam Risk – Does it avoid spammy keywords, formatting, or clickbait?
+
+👉 Add up the 4 scores to give a total out of 100.  
+Do not use decimal values or multipliers. Just sum the 4 categories.
+
+Then provide quick expert feedback (1–3 lines): what's good, what can be better.
+
+Finally, rewrite the subject line into 3 better alternatives that follow these rules:
+- 2 to 3 words only (max 4 if absolutely needed)
+- Feel like natural curiosity triggers or insights
+- No salesy buzzwords or fake urgency
+- Take inspiration from formats like:
+  • "Automate Outreach?"
+  • "30% More Replies?"
+  • "Sendlane's Secret"
+  • "Lead Gen Struggle?"
+  • "Time-Saving Trick?"
+
+---
 
 Use this format exactly:
----
+
 Subject Line Score: [total_score]/100
 
-* Clarity: X/10  
-* Curiosity: X/10  
-* Personalization: X/10  
-* Spam Risk: X/10  
+* Clarity: X/25  
+* Curiosity: X/25  
+* Personalization: X/25  
+* Spam Risk: X/25  
 
 Feedback:  
-[Feedback here]
+[Your analysis here.]
 
 Suggested Alternatives:
 1. [Alt 1]
 2. [Alt 2]
 3. [Alt 3]
 
-Keep subject lines under 10 words and avoid salesy phrases.
-
-Evaluate this cold email subject line:  
+Now analyze this cold email subject line:  
 "${subject}"
-
-Tone to apply for rewrites: ${tone}
 `;
 
   try {
@@ -59,7 +76,7 @@ Tone to apply for rewrites: ${tone}
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini-2024-07-18', // 🔥 mini model activated
+        model: 'gpt-4o-mini-2024-07-18',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7
       })
